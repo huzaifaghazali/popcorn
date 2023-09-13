@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function NumbResults() {
+export default function NumbResults({ movies }) {
   return (
     <p className='num-results'>
-      Found <strong>X</strong> results
+      Found <strong>{movies.length}</strong> results
     </p>
   );
 }

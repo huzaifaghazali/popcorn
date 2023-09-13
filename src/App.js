@@ -53,13 +53,15 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+  
   return (
     <>
-      <Navbar />
+      <Navbar movies={movies} />
       <Main
         average={average}
-        tempMovieData={tempMovieData}
         tempWatchedData={tempWatchedData}
+        movies={movies}
       />
     </>
   );
