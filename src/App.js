@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import Search from './components/Search';
@@ -58,14 +58,29 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-
+const KEY = 'f84fc31d';
+/* 
+    API: http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}
+  */
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [query, setQuery] = useState('');
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+  const [query, setQuery] = useState('interstellar');
   const [isLoading, setIsLoading] = useState('');
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState('');
+
+  useEffect(() => {
+    async function fetchMovies() {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+      );
+      const data = await res.json();
+      setMovies(data.Search);
+      console.log(movies);
+    }
+    fetchMovies();
+  }, []);
 
   return (
     <>
