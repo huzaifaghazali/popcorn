@@ -46,6 +46,7 @@ export default function MovieDetails({
     onCloseMovie();
   }
 
+  // use effect for fetching the data
   useEffect(() => {
     async function getMovieDetails() {
       try {
@@ -70,6 +71,17 @@ export default function MovieDetails({
 
     getMovieDetails();
   }, [selectedId]);
+
+  // use effect for setting the browser title
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    return function () {
+      document.title = 'usePopcorn';
+      // console.log(`Clean up effect for movie ${title}`);
+    };
+  }, [title]);
 
   return (
     <div className='details'>
