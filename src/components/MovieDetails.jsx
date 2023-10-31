@@ -2,10 +2,22 @@ import React, { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import Loader from './Loader';
 const KEY = '3696af6';
-export default function MovieDetails({ selectedId, onCloseMovie }) {
+export default function MovieDetails({
+  selectedId,
+  onCloseMovie,
+  onAddWatched,
+  watched,
+}) {
   const [movie, setMovie] = useState({});
   const [userRating, setUserRating] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
+
   const {
     Title: title,
     Year: year,
@@ -19,16 +31,41 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
     Genre: genre,
   } = movie;
 
+  function handleAdd() {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(' ').at(0)),
+      userRating,
+    };
+
+    onAddWatched(newWatchedMovie);
+    onCloseMovie();
+  }
+
   useEffect(() => {
     async function getMovieDetails() {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
-      );
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+        );
 
-      const data = await res.json();
-      setMovie(data);
-      setIsLoading(false);
+        if (!res.ok) {
+          throw new Error('Something went wrong with fetching movies');
+        }
+
+        const data = await res.json();
+
+        if (data.Response === 'False') {
+          throw new Error('Movies not found');
+        }
+        setMovie(data);
+        setIsLoading(false);
+      } catch (error) {}
     }
 
     getMovieDetails();
@@ -59,11 +96,25 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
           </header>
           <section>
             <div className='rating'>
-              <StarRating
-                maxRating={10}
-                size={24}
-                onSetRating={setUserRating}
-              />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+
+                  {userRating > 0 && (
+                    <button className='btn-add' onClick={handleAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>
+                  You rated with movie {watchedUserRating} <span>⭐️</span>
+                </p>
+              )}
             </div>
             <p>
               <em>{plot}</em>
