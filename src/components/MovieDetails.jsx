@@ -48,6 +48,7 @@ export default function MovieDetails({
 
   // use effect for fetching the data
   useEffect(() => {
+
     async function getMovieDetails() {
       try {
         setIsLoading(true);
@@ -66,7 +67,9 @@ export default function MovieDetails({
         }
         setMovie(data);
         setIsLoading(false);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error.message);
+      }
     }
 
     getMovieDetails();
@@ -82,6 +85,24 @@ export default function MovieDetails({
       // console.log(`Clean up effect for movie ${title}`);
     };
   }, [title]);
+
+  // use effect for escape key
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
   return (
     <div className='details'>
